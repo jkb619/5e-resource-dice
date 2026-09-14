@@ -1,9 +1,12 @@
 # Resource Dice — build & release helper
 #
 # Usage:
-#   make module    Build module.zip and upload it to a GitHub release
-#   make build     Build module.zip only (no upload)
-#   make clean      Remove the built zip
+#   make module    Bump version (prompts M/m/p), build module.zip, upload release
+#   make bump      Interactively bump the version in module.json (M/m/p)
+#   make build     Build module.zip only (no version change, no upload)
+#   make upload    Upload the current module.zip to a matching GitHub release
+#   make clean     Remove the built zip
+#   make version   Print the current version from module.json
 #
 # Requires: zip, python3, and the GitHub CLI (gh) authenticated via `gh auth login`.
 
@@ -11,14 +14,19 @@
 CONTENTS := module.json scripts styles lang README.md
 
 # Read the version straight out of the manifest so the release tag always matches.
-VERSION := $(shell python3 -c "import json; print(json.load(open('module.json'))['version'])")
+VERSION = $(shell python3 -c "import json; print(json.load(open('module.json'))['version'])")
 
 ZIP := module.zip
 
-.PHONY: module build upload clean version
+.PHONY: module bump build upload clean version
 
-## Build the zip, then create/replace the matching GitHub release.
-module: build upload
+## Full release flow: bump the version, build the zip, then upload it.
+module: bump build upload
+
+## Interactively bump the semantic version in module.json.
+## Prompts for Major / minor / patch and shows the resulting version.
+bump:
+	@python3 scripts/bump_version.py
 
 ## Build module.zip with the manifest at the archive root.
 build: clean
@@ -28,10 +36,19 @@ build: clean
 	@unzip -l $(ZIP)
 
 ## Publish the zip to a GitHub release tagged with the manifest version.
-## If a release for this version already exists, its asset is replaced.
+## Confirms the version with you first. If a release for this version already
+## exists, its asset is replaced (--clobber); otherwise the release is created.
 upload:
-	@command -v gh >/dev/null 2>&1 || { echo "ERROR: GitHub CLI (gh) not found. Install it or run 'make build' and upload manually."; exit 1; }
+	@command -v gh >/dev/null 2>&1 || { echo "ERROR: GitHub CLI (gh) not found. Install it or upload manually."; exit 1; }
 	@test -f $(ZIP) || { echo "ERROR: $(ZIP) not found. Run 'make build' first."; exit 1; }
+	@echo ""
+	@echo "About to upload version: $(VERSION)"
+	@printf "Proceed with release v$(VERSION)? [y/N] "; \
+	read ans; \
+	case "$$ans" in \
+		[yY]|[yY][eE][sS]) ;; \
+		*) echo "Aborted."; exit 1 ;; \
+	esac
 	@if gh release view $(VERSION) >/dev/null 2>&1; then \
 		echo "Release $(VERSION) exists — replacing asset..."; \
 		gh release upload $(VERSION) $(ZIP) --clobber; \
