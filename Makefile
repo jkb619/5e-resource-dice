@@ -1,14 +1,15 @@
 # Resource Dice — build & release helper
 #
 # Usage:
-#   make module    Bump version (prompts M/m/p), build module.zip, upload release
+#   make module    Bump version, commit & push, build module.zip, upload release
 #   make bump      Interactively bump the version in module.json (M/m/p)
+#   make push      Commit all changes and push to the current branch
 #   make build     Build module.zip only (no version change, no upload)
 #   make upload    Upload the current module.zip to a matching GitHub release
 #   make clean     Remove the built zip
 #   make version   Print the current version from module.json
 #
-# Requires: zip, python3, and the GitHub CLI (gh) authenticated via `gh auth login`.
+# Requires: git, zip, python3, and the GitHub CLI (gh) authenticated via `gh auth login`.
 
 # Files that ship inside the module. module.json MUST be at the archive root.
 CONTENTS := module.json scripts styles lang README.md
@@ -18,15 +19,31 @@ VERSION = $(shell python3 -c "import json; print(json.load(open('module.json'))[
 
 ZIP := module.zip
 
-.PHONY: module bump build upload clean version
+.PHONY: module bump push build upload clean version
 
-## Full release flow: bump the version, build the zip, then upload it.
-module: bump build upload
+## Full release flow: bump the version, commit & push, build the zip, upload it.
+## Push happens before upload so the branch manifest (which Foundry reads for
+## updates) and the GitHub release always stay in lockstep.
+module: bump push build upload
 
 ## Interactively bump the semantic version in module.json.
 ## Prompts for Major / minor / patch and shows the resulting version.
 bump:
 	@python3 scripts/bump_version.py
+
+## Commit every change and push to the current branch. This keeps main's
+## module.json in sync so Foundry sees the new version on refresh.
+push:
+	@command -v git >/dev/null 2>&1 || { echo "ERROR: git not found."; exit 1; }
+	@if git diff --quiet && git diff --cached --quiet; then \
+		echo "No changes to commit — pushing any unpushed commits."; \
+	else \
+		git add -A; \
+		git commit -m "Release $(VERSION)"; \
+	fi
+	@branch=$$(git rev-parse --abbrev-ref HEAD); \
+	echo "Pushing to origin/$$branch..."; \
+	git push -u origin "$$branch"
 
 ## Build module.zip with the manifest at the archive root.
 build: clean

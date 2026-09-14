@@ -2,7 +2,7 @@
     "id": "resource-dice",
     "title": "Resource Dice",
     "description": "Adds freeform 'Resource Dice' tracks to D&D 5e character sheets. Track consumable resources (arrows, oil flasks, spell components, etc.) as a stepping die that shrinks as they deplete.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "compatibility": {
         "minimum": "14",
         "verified": "14"
