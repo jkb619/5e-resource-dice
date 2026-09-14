@@ -1,0 +1,175 @@
+/* Resource Dice — sidebar section styling for the dnd5e character sheet.
+ *
+ * The sidebar stat card is always dark (regardless of light/dark theme), so
+ * this section mirrors the Hit Points / Hit Dice fields directly above it:
+ * light text, transparent/dark fills, and gold-bordered input boxes. */
+
+.dnd5e2.sheet .resource-dice.meter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Header: title + add button. Matches the other meter-group labels. */
+.dnd5e2.sheet .resource-dice .resource-dice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  color: var(--color-text-light-0, #f7f3e8);
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  color: var(--dnd5e-color-gold, #9f7300);
+  font-size: var(--font-size-11, 11px);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-add:hover {
+  color: var(--color-text-light-0, #f7f3e8);
+  transform: scale(1.15);
+}
+
+/* Track list */
+.dnd5e2.sheet .resource-dice .resource-dice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-empty {
+  font-size: var(--font-size-10, 10px);
+  font-style: italic;
+  color: var(--color-text-light-6, #9f9d97);
+  text-align: center;
+  padding: 2px 0;
+}
+
+/* Individual track row */
+.dnd5e2.sheet .resource-dice .resource-dice-track {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-track.depleted {
+  opacity: 0.55;
+}
+
+/* Freeform label */
+.dnd5e2.sheet .resource-dice .resource-dice-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--font-size-11, 11px);
+  font-family: var(--dnd5e-font-roboto, "Roboto", sans-serif);
+  color: var(--color-text-light-0, #f7f3e8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Editable label: transparent field inside a gold-bordered box, like the HP
+   value box above. */
+.dnd5e2.sheet .resource-dice input.resource-dice-label {
+  padding: 1px 6px;
+  background: none;
+  color: var(--color-text-light-0, #f7f3e8);
+  border: var(--dnd5e-border-gold, 1px solid var(--dnd5e-color-gold, #9f7300));
+  border-radius: 4px;
+  box-shadow: 0 0 4px var(--dnd5e-shadow-45, rgba(0, 0, 0, 0.45)) inset;
+}
+
+.dnd5e2.sheet .resource-dice input.resource-dice-label::placeholder {
+  color: var(--color-text-light-6, #9f9d97);
+}
+
+.dnd5e2.sheet .resource-dice input.resource-dice-label:hover,
+.dnd5e2.sheet .resource-dice input.resource-dice-label:focus {
+  box-shadow: 0 0 6px var(--dnd5e-color-gold, #9f7300);
+  outline: 0;
+}
+
+/* Controls cluster */
+.dnd5e2.sheet .resource-dice .resource-dice-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-step,
+.dnd5e2.sheet .resource-dice .resource-dice-delete,
+.dnd5e2.sheet .resource-dice .resource-dice-roll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  font-size: var(--font-size-11, 11px);
+  color: var(--color-text-light-6, #9f9d97);
+  border-radius: 3px;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-step:hover,
+.dnd5e2.sheet .resource-dice .resource-dice-delete:hover,
+.dnd5e2.sheet .resource-dice .resource-dice-roll:hover:not(:disabled) {
+  color: var(--color-text-light-0, #f7f3e8);
+  text-shadow: 0 0 6px var(--dnd5e-color-gold, #9f7300);
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-roll {
+  color: var(--dnd5e-color-gold, #9f7300);
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-roll:disabled {
+  color: var(--color-text-light-6, #9f9d97);
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* Current-die readout (non-owner view) */
+.dnd5e2.sheet .resource-dice .resource-dice-current {
+  font-size: var(--font-size-11, 11px);
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-light-0, #f7f3e8);
+}
+
+/* Die selector: dark fill, light bold text, gold-bordered box. */
+.dnd5e2.sheet .resource-dice .resource-dice-select {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 48px;
+  height: 20px;
+  padding: 0 2px;
+  font-size: var(--font-size-11, 11px);
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--color-text-light-0, #f7f3e8);
+  background: rgba(0, 0, 0, 0.45);
+  border: var(--dnd5e-border-gold, 1px solid var(--dnd5e-color-gold, #9f7300));
+  border-radius: 4px;
+}
+
+.dnd5e2.sheet .resource-dice .resource-dice-select:hover,
+.dnd5e2.sheet .resource-dice .resource-dice-select:focus {
+  box-shadow: 0 0 6px var(--dnd5e-color-gold, #9f7300);
+  outline: 0;
+}
+
+/* Ensure dropdown option text is readable in the native popup. */
+.dnd5e2.sheet .resource-dice .resource-dice-select option {
+  color: var(--color-text-dark-primary, #191813);
+  background: var(--color-text-light-0, #f7f3e8);
+}

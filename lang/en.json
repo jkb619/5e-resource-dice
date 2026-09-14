@@ -1,0 +1,17 @@
+{
+    "RESOURCEDICE.Resources": "Resources",
+    "RESOURCEDICE.Resource": "Resource",
+    "RESOURCEDICE.NewResource": "New Resource",
+    "RESOURCEDICE.AddResource": "Add Resource Die",
+    "RESOURCEDICE.LabelPlaceholder": "Name (e.g. Arrows)",
+    "RESOURCEDICE.CurrentDie": "Current Die",
+    "RESOURCEDICE.Roll": "Roll Resource Die",
+    "RESOURCEDICE.StepUp": "Increase Die Step",
+    "RESOURCEDICE.StepDown": "Decrease Die Step",
+    "RESOURCEDICE.Delete": "Remove Resource Die",
+    "RESOURCEDICE.Empty": "No resources tracked.",
+    "RESOURCEDICE.RollFlavor": "{label} ({die})",
+    "RESOURCEDICE.SteppedDown": "Stepped down to {die}",
+    "RESOURCEDICE.Depleted": "Depleted!",
+    "RESOURCEDICE.DepletedWarning": "{label} is depleted and cannot be rolled."
+}
