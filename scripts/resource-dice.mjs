@@ -256,10 +256,10 @@ async function rollDie(actor, id, event) {
 /**
  * Build the DOM for the Resources section.
  * @param {Actor} actor
- * @param {boolean} editable  Whether the sheet is currently editable.
+ * @param {boolean} unlocked  Whether the sheet is unlocked (edit mode).
  * @returns {HTMLElement}
  */
-function buildSection(actor, editable) {
+function buildSection(actor, unlocked) {
   const tracks = getTracks(actor);
   const isOwner = actor.isOwner;
 
@@ -274,7 +274,9 @@ function buildSection(actor, editable) {
   title.textContent = game.i18n.localize("RESOURCEDICE.Resources");
   header.appendChild(title);
 
-  if ( isOwner ) {
+  // The add (+) button only appears for owners when the sheet is unlocked,
+  // matching the dnd5e sheet's own edit controls (e.g. the config cogs).
+  if ( isOwner && unlocked ) {
     const add = document.createElement("button");
     add.type = "button";
     add.classList.add("unbutton", "resource-dice-add");
@@ -291,7 +293,7 @@ function buildSection(actor, editable) {
   list.classList.add("unlist", "resource-dice-list");
 
   for ( const track of tracks ) {
-    list.appendChild(buildTrackRow(track, { editable, isOwner }));
+    list.appendChild(buildTrackRow(track, { unlocked, isOwner }));
   }
 
   if ( !tracks.length ) {
@@ -307,18 +309,24 @@ function buildSection(actor, editable) {
 
 /**
  * Build a single track row element.
+ *
+ * Rolling and adjusting the die (+/-, select) stay available whenever the owner
+ * can use the sheet, so resources are usable during play. Structural editing —
+ * renaming and deleting a track — is gated behind the sheet lock (unlocked /
+ * edit mode), mirroring the + button and the system's own config controls.
+ *
  * @param {{id: string, label: string, faces: number}} track
- * @param {{editable: boolean, isOwner: boolean}} options
+ * @param {{unlocked: boolean, isOwner: boolean}} options
  * @returns {HTMLElement}
  */
-function buildTrackRow(track, { editable, isOwner }) {
+function buildTrackRow(track, { unlocked, isOwner }) {
   const li = document.createElement("li");
   li.classList.add("resource-dice-track");
   li.dataset.trackId = track.id;
   if ( track.faces <= 0 ) li.classList.add("depleted");
 
   /* --- Label --- */
-  if ( isOwner ) {
+  if ( isOwner && unlocked ) {
     const label = document.createElement("input");
     label.type = "text";
     label.classList.add("uninput", "resource-dice-label");
@@ -383,15 +391,17 @@ function buildTrackRow(track, { editable, isOwner }) {
     if ( track.faces <= 0 ) roll.disabled = true;
     controls.appendChild(roll);
 
-    // Delete button.
-    const del = document.createElement("button");
-    del.type = "button";
-    del.classList.add("unbutton", "resource-dice-delete");
-    del.dataset.rdAction = "delete";
-    del.dataset.tooltip = game.i18n.localize("RESOURCEDICE.Delete");
-    del.setAttribute("aria-label", game.i18n.localize("RESOURCEDICE.Delete"));
-    del.innerHTML = '<i class="fas fa-trash" inert></i>';
-    controls.appendChild(del);
+    // Delete button — only when the sheet is unlocked (edit mode).
+    if ( unlocked ) {
+      const del = document.createElement("button");
+      del.type = "button";
+      del.classList.add("unbutton", "resource-dice-delete");
+      del.dataset.rdAction = "delete";
+      del.dataset.tooltip = game.i18n.localize("RESOURCEDICE.Delete");
+      del.setAttribute("aria-label", game.i18n.localize("RESOURCEDICE.Delete"));
+      del.innerHTML = '<i class="fas fa-trash" inert></i>';
+      controls.appendChild(del);
+    }
   } else {
     // Read-only: show current die and allow rolling.
     const roll = document.createElement("button");
@@ -498,8 +508,13 @@ function onRenderCharacterSheet(app, html) {
 
   // Preferred anchor: inside the sidebar stats card, after Hit Dice.
   const stats = root.querySelector(".sidebar .card .stats");
-  const editable = app.isEditable ?? false;
-  const section = buildSection(actor, editable);
+
+  // The dnd5e sheet has a lock toggle: editing controls only show when the
+  // sheet is unlocked (edit mode). Mirror that for the add (+) button.
+  // isEditMode is the lock state; fall back to the "editable" root class or
+  // the permission flag for other/derived sheets that lack it.
+  const unlocked = (app.isEditMode ?? root.classList.contains("editable") ?? app.isEditable) ?? false;
+  const section = buildSection(actor, unlocked);
 
   if ( stats ) {
     stats.appendChild(section);
