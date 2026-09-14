@@ -95,13 +95,16 @@ function serializeTracks(tracks) {
  * @returns {Promise<Actor>}
  */
 async function writeTracks(actor, tracks) {
+  // setFlag MERGES into the existing flag, so removed keys (e.g. a deleted
+  // track, or every track when the list becomes empty) would linger. To force
+  // a true replacement, clear the flag first, then write the fresh object.
   const stored = actor.getFlag(MODULE_ID, FLAG_KEY);
-  const isPlainObject = stored && (foundry.utils.getType(stored) === "Object");
-  if ( stored !== undefined && !isPlainObject ) {
-    // Clear a legacy / malformed value before writing the clean object.
-    await actor.unsetFlag(MODULE_ID, FLAG_KEY);
-  }
-  return actor.setFlag(MODULE_ID, FLAG_KEY, serializeTracks(tracks));
+  if ( stored !== undefined ) await actor.unsetFlag(MODULE_ID, FLAG_KEY);
+
+  const data = serializeTracks(tracks);
+  // Nothing left to store: leaving the flag unset is the correct empty state.
+  if ( foundry.utils.isEmpty(data) ) return actor;
+  return actor.setFlag(MODULE_ID, FLAG_KEY, data);
 }
 
 /* -------------------------------------------- */
