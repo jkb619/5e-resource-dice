@@ -13,6 +13,22 @@
 const MODULE_ID = "resource-dice";
 const FLAG_KEY = "tracks";
 
+/** Setting key: rolling at or below this value steps the die down. */
+const SETTING_DECREMENT_ON = "decrementOn";
+
+/**
+ * Get the configured "decrement die on" threshold. A roll whose total is at or
+ * below this value steps the die down. Defaults to 2.
+ * @returns {number}
+ */
+function getDecrementThreshold() {
+  try {
+    return game.settings.get(MODULE_ID, SETTING_DECREMENT_ON);
+  } catch {
+    return 2;
+  }
+}
+
 /**
  * The ordered ladder of die steps, from largest to smallest, ending in a
  * "depleted" state (0). The index into this array is the die's current step.
@@ -213,8 +229,9 @@ async function rollDie(actor, id, event) {
     die: dieLabel(track.faces)
   });
 
-  // Resource die depletion: rolling a 1 or 2 steps the die down.
-  const stepsDown = roll.total <= 2;
+  // Resource die depletion: rolling at or below the configured threshold
+  // (default 2) steps the die down.
+  const stepsDown = roll.total <= getDecrementThreshold();
   let newFaces;
   if ( stepsDown ) {
     newFaces = await stepDie(actor, id, -1);
@@ -501,6 +518,17 @@ function onRenderCharacterSheet(app, html) {
 
 Hooks.once("init", () => {
   console.log(`${MODULE_ID} | Initializing Resource Dice`);
+
+  // World setting: the roll value at or below which a resource die steps down.
+  game.settings.register(MODULE_ID, SETTING_DECREMENT_ON, {
+    name: "RESOURCEDICE.Settings.DecrementOn.Name",
+    hint: "RESOURCEDICE.Settings.DecrementOn.Hint",
+    scope: "world",
+    config: true,
+    type: Number,
+    default: 2,
+    range: { min: 0, max: 20, step: 1 }
+  });
 });
 
 // dnd5e 6.x character sheet is an ApplicationV2 named "CharacterActorSheet".

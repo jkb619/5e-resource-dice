@@ -13,5 +13,7 @@
     "RESOURCEDICE.RollFlavor": "{label} ({die})",
     "RESOURCEDICE.SteppedDown": "Stepped down to {die}",
     "RESOURCEDICE.Depleted": "Depleted!",
-    "RESOURCEDICE.DepletedWarning": "{label} is depleted and cannot be rolled."
+    "RESOURCEDICE.DepletedWarning": "{label} is depleted and cannot be rolled.",
+    "RESOURCEDICE.Settings.DecrementOn.Name": "Decrement die on",
+    "RESOURCEDICE.Settings.DecrementOn.Hint": "When a resource die is rolled, a result at or below this number steps the die down one size (1d8 → 1d6 → … → depleted). Default is 2. Set to 0 to never step down automatically."
 }
