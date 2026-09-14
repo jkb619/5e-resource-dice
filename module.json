@@ -12,6 +12,9 @@
             "name": "Resource Dice"
         }
     ],
+    "url": "https://github.com/jkb619/5e-resource-dice",
+    "manifest": "https://raw.githubusercontent.com/jkb619/5e-resource-dice/main/module.json",
+    "download": "https://github.com/jkb619/5e-resource-dice/releases/latest/download/module.zip",
     "esmodules": [
         "scripts/resource-dice.mjs"
     ],
